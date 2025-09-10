@@ -1,6 +1,6 @@
 {
-	"short_name": "TUD Timetable",
-	"name": "TUD new timetable",
+	"short_name": "Timetable",
+	"name": "Timetable",
 	"icons": [
 		{
 			"src": "icons/manifest-icon-192.maskable.png",
