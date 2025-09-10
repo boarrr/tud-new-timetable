@@ -1,4 +1,4 @@
-import { LogoIcon } from "./icons/LogoIcon";
+// import { LogoIcon } from "./icons/LogoIcon";
 import Search from "./Search";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -7,9 +7,9 @@ const Header = ({ selectedProgram, setSelectedProgram }) => {
 		<header>
 			<div className="header-wrapper">
 				<div className="left-header">
-					<div className="logo">
+					{/* <div className="logo">
 						<LogoIcon alt="Logo" />
-					</div>
+					</div> */}
 					<Search
 						selectedProgram={selectedProgram}
 						setSelectedProgram={setSelectedProgram}
