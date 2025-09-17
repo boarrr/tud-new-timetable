@@ -3,7 +3,6 @@ import { useState, useCallback } from "react";
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
-import VisitMessage from "./VisitMessage";
 import { useSelectedProgram } from "../customHooks/useSelectedProgram";
 import { getCurWeekStartTime } from "../utils/helpers";
 import { useIsMobile } from "../customHooks/useIsMobile";
@@ -37,8 +36,6 @@ const TimetablePage = () => {
 
 	return (
 		<div className="inner-body">
-			<VisitMessage />
-
 			<Header selectedProgram={selectedProgram} setSelectedProgram={setSelectedProgram} />
 			<Main
 				isMobile={isMobile}
