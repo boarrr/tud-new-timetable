@@ -1026,13 +1026,6 @@ svg {
 	fill: hsl(var(--c-neutral-900));
 }
 
-/* super small devices */
-@media (max-width: 24em) {
-	.logo {
-		display: none;
-	}
-}
-
 /* desktop styles */
 @media (min-width: 48em) {
 	:root {

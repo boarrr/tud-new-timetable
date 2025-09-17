@@ -21,12 +21,9 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# GitHub Pages specific (not needed for Vercel)
-public/CNAME
-
-# Design files
-design/
-
 # Git
 .git/
 .gitignore
+
+# README
+README.md
