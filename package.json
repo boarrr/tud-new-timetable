@@ -2,7 +2,7 @@
 	"name": "tud-new-timetable",
 	"version": "0.3.1",
 	"private": true,
-	"homepage": "https://timetable.konstantin-sklyar.com",
+	"homepage": "https://timetable.ryanpitman.dev",
 	"dependencies": {
 		"@testing-library/jest-dom": "^5.17.0",
 		"@testing-library/react": "^13.4.0",
