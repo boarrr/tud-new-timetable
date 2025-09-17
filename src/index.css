@@ -1026,6 +1026,18 @@ svg {
 	fill: hsl(var(--c-neutral-900));
 }
 
+/* Hidden lesson styles */
+.hidden-lesson {
+	opacity: 0.3 !important;
+	filter: grayscale(100%);
+	transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.hidden-lesson:hover {
+	opacity: 0.6 !important;
+	filter: grayscale(50%);
+}
+
 /* desktop styles */
 @media (min-width: 48em) {
 	:root {

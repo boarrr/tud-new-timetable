@@ -5,10 +5,14 @@ import constants from "../constants";
 import { ClockIcon } from "./icons/ClockIcon";
 import { PersonIcon } from "./icons/PersonIcon";
 import { LocationIcon } from "./icons/LocationIcon";
+import { useHiddenLessons } from "../customHooks/useHiddenLessons";
 
 const iconSize = 12;
 
 const DesktopLesson = ({ content, hourLen, prevEndTime, leftSide }) => {
+	const { isLessonHidden, toggleLessonVisibility } = useHiddenLessons();
+	const isHidden = isLessonHidden(content.lessonId);
+	
 	const duration =
 		content.EndDateTime.diff(content.StartDateTime) * constants.millisecondsToHours;
 	const topMargin = content.StartDateTime.diff(prevEndTime) * constants.millisecondsToHours;
@@ -70,6 +74,25 @@ const DesktopLesson = ({ content, hourLen, prevEndTime, leftSide }) => {
 		setVisiblePopup(false);
 	};
 
+	const handleDoubleClick = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		toggleLessonVisibility(content.lessonId);
+	};
+
+	const handleTouchEnd = (e) => {
+		// Handle double-tap on mobile
+		if (e.touches.length === 0) {
+			const now = Date.now();
+			if (!handleTouchEnd.lastTouchEnd || now - handleTouchEnd.lastTouchEnd < 300) {
+				e.preventDefault();
+				e.stopPropagation();
+				toggleLessonVisibility(content.lessonId);
+			}
+			handleTouchEnd.lastTouchEnd = now;
+		}
+	};
+
 	const onHover = () => {
 		if (popupTimer) {
 			clearInterval(popupTimer);
@@ -126,7 +149,7 @@ const DesktopLesson = ({ content, hourLen, prevEndTime, leftSide }) => {
 
 	return (
 		<div
-			className={"desktop-lesson" + (visiblePopup ? " show-popup" : "")}
+			className={"desktop-lesson" + (visiblePopup ? " show-popup" : "") + (isHidden ? " hidden-lesson" : "")}
 			style={{
 				height: duration * hourLen + "rem",
 				marginTop: topMargin * hourLen + "rem",
@@ -135,6 +158,8 @@ const DesktopLesson = ({ content, hourLen, prevEndTime, leftSide }) => {
 			onMouseEnter={onHover}
 			onMouseLeave={onStopHover}
 			onClick={showPopup}
+			onDoubleClick={handleDoubleClick}
+			onTouchEnd={handleTouchEnd}
 			onFocus={showPopup}
 			onBlur={hidePopup}
 			tabIndex="0"

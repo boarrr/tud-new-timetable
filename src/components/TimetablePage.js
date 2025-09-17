@@ -7,6 +7,7 @@ import { useSelectedProgram } from "../customHooks/useSelectedProgram";
 import { getCurWeekStartTime } from "../utils/helpers";
 import { useIsMobile } from "../customHooks/useIsMobile";
 import { useGetLessons } from "../customHooks/useGetLessons";
+import { HiddenLessonsProvider } from "../customHooks/useHiddenLessons";
 
 const TimetablePage = () => {
 	const [displayedWeekStart, setDisplayedWeekStart] = useState(getCurWeekStartTime());
@@ -35,20 +36,22 @@ const TimetablePage = () => {
 	);
 
 	return (
-		<div className="inner-body">
-			<Header selectedProgram={selectedProgram} setSelectedProgram={setSelectedProgram} />
-			<Main
-				isMobile={isMobile}
-				lessons={lessons}
-				isPending={isPending}
-				error={error}
-				reload={reload}
-				loadMore={loadMore}
-				displayedWeekStart={displayedWeekStart}
-				toToday={toToday}
-			/>
-			<Footer />
-		</div>
+		<HiddenLessonsProvider>
+			<div className="inner-body">
+				<Header selectedProgram={selectedProgram} setSelectedProgram={setSelectedProgram} />
+				<Main
+					isMobile={isMobile}
+					lessons={lessons}
+					isPending={isPending}
+					error={error}
+					reload={reload}
+					loadMore={loadMore}
+					displayedWeekStart={displayedWeekStart}
+					toToday={toToday}
+				/>
+				<Footer />
+			</div>
+		</HiddenLessonsProvider>
 	);
 };
 

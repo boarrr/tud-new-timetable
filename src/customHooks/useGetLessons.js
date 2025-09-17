@@ -70,6 +70,13 @@ function organizeLessons(lessons) {
 		}
 		Description = fixDescr(Description);
 
+		// Build a stable lesson identifier using raw API timestamps to avoid formatting drift
+		const stableStart = _StartDateTime; // raw ISO from API
+		const stableEnd = _EndDateTime;     // raw ISO from API
+		const stableLocation = Location || "";
+		const stableName = Name || "";
+		const stableLessonId = `${stableName}|${stableStart}|${stableEnd}|${stableLocation}`;
+
 		return {
 			StartDateTime,
 			EndDateTime,
@@ -78,6 +85,7 @@ function organizeLessons(lessons) {
 			Name,
 			EventType,
 			staffName,
+			lessonId: stableLessonId,
 		};
 	});
 

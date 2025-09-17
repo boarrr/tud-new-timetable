@@ -2,10 +2,14 @@ import getLessonColor from "../getLessonColor";
 import constants from "../constants";
 import { PersonIcon } from "./icons/PersonIcon";
 import { LocationIcon } from "./icons/LocationIcon";
+import { useHiddenLessons } from "../customHooks/useHiddenLessons";
 
 const iconSize = 15;
 
 const MobileTimetableLesson = ({ lessonInfo, current }) => {
+	const { isLessonHidden, toggleLessonVisibility } = useHiddenLessons();
+	const isHidden = isLessonHidden(lessonInfo.lessonId);
+	
 	const startTime = lessonInfo.StartDateTime.tz(constants.curTimezone).format("k:mm");
 	const endTime = lessonInfo.EndDateTime.tz(constants.curTimezone).format("k:mm");
 
@@ -54,10 +58,31 @@ const MobileTimetableLesson = ({ lessonInfo, current }) => {
 		}
 	}
 
+	const handleDoubleClick = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		toggleLessonVisibility(lessonInfo.lessonId);
+	};
+
+	const handleTouchEnd = (e) => {
+		// Handle double-tap on mobile
+		if (e.touches.length === 0) {
+			const now = Date.now();
+			if (!handleTouchEnd.lastTouchEnd || now - handleTouchEnd.lastTouchEnd < 300) {
+				e.preventDefault();
+				e.stopPropagation();
+				toggleLessonVisibility(lessonInfo.lessonId);
+			}
+			handleTouchEnd.lastTouchEnd = now;
+		}
+	};
+
 	return (
 		<div
-			className={"mobile-lesson" + (current ? " current" : "")}
+			className={"mobile-lesson" + (current ? " current" : "") + (isHidden ? " hidden-lesson" : "")}
 			style={{ "--type-color": getLessonColor(lessonInfo.EventType) }}
+			onDoubleClick={handleDoubleClick}
+			onTouchEnd={handleTouchEnd}
 		>
 			<div className="lesson-type-grid-item">
 				{lessonInfo.EventType && (
