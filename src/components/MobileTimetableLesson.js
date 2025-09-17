@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import getLessonColor from "../getLessonColor";
 import constants from "../constants";
 import { PersonIcon } from "./icons/PersonIcon";
@@ -7,8 +8,8 @@ import { useHiddenLessons } from "../customHooks/useHiddenLessons";
 const iconSize = 15;
 
 const MobileTimetableLesson = ({ lessonInfo, current }) => {
-	const { isLessonHidden, toggleLessonVisibility } = useHiddenLessons();
-	const isHidden = isLessonHidden(lessonInfo.lessonId);
+    const { isLessonHidden, toggleLessonVisibility } = useHiddenLessons();
+    const isHidden = isLessonHidden(lessonInfo.lessonId);
 	
 	const startTime = lessonInfo.StartDateTime.tz(constants.curTimezone).format("k:mm");
 	const endTime = lessonInfo.EndDateTime.tz(constants.curTimezone).format("k:mm");
@@ -58,31 +59,51 @@ const MobileTimetableLesson = ({ lessonInfo, current }) => {
 		}
 	}
 
-	const handleDoubleClick = (e) => {
-		e.preventDefault();
-		e.stopPropagation();
-		toggleLessonVisibility(lessonInfo.lessonId);
-	};
+    const handleDoubleClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleLessonVisibility(lessonInfo.lessonId);
+    };
 
-	const handleTouchEnd = (e) => {
-		// Handle double-tap on mobile
-		if (e.touches.length === 0) {
-			const now = Date.now();
-			if (!handleTouchEnd.lastTouchEnd || now - handleTouchEnd.lastTouchEnd < 300) {
-				e.preventDefault();
-				e.stopPropagation();
-				toggleLessonVisibility(lessonInfo.lessonId);
-			}
-			handleTouchEnd.lastTouchEnd = now;
-		}
-	};
+    // Mobile double-tap detection with movement guard
+    const lastTapRef = useRef(0);
+    const touchStartPosRef = useRef({ x: 0, y: 0 });
+    const TOUCH_TIME_MS = 300;
+    const MOVE_TOLERANCE_PX = 12;
+
+    const handleTouchStart = (e) => {
+        if (e.touches && e.touches.length > 0) {
+            const t = e.touches[0];
+            touchStartPosRef.current = { x: t.clientX, y: t.clientY };
+        }
+    };
+
+    const handleTouchEnd = (e) => {
+        const t = e.changedTouches && e.changedTouches[0];
+        if (t) {
+            const dx = t.clientX - touchStartPosRef.current.x;
+            const dy = t.clientY - touchStartPosRef.current.y;
+            const moved = Math.hypot(dx, dy) > MOVE_TOLERANCE_PX;
+            if (moved) return; // treat as scroll/drag
+        }
+
+        const now = Date.now();
+        const isDoubleTap = lastTapRef.current && now - lastTapRef.current < TOUCH_TIME_MS;
+        lastTapRef.current = now;
+        if (!isDoubleTap) return; // first tap only, do nothing
+
+        e.preventDefault();
+        e.stopPropagation();
+        toggleLessonVisibility(lessonInfo.lessonId);
+    };
 
 	return (
 		<div
-			className={"mobile-lesson" + (current ? " current" : "") + (isHidden ? " hidden-lesson" : "")}
-			style={{ "--type-color": getLessonColor(lessonInfo.EventType) }}
-			onDoubleClick={handleDoubleClick}
-			onTouchEnd={handleTouchEnd}
+            className={"mobile-lesson" + (current ? " current" : "") + (isHidden ? " hidden-lesson" : "")}
+            style={{ "--type-color": getLessonColor(lessonInfo.EventType) }}
+            onDoubleClick={handleDoubleClick}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
 		>
 			<div className="lesson-type-grid-item">
 				{lessonInfo.EventType && (

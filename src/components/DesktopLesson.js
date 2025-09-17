@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import getLessonColor from "../getLessonColor";
 import constants from "../constants";
@@ -80,17 +80,38 @@ const DesktopLesson = ({ content, hourLen, prevEndTime, leftSide }) => {
 		toggleLessonVisibility(content.lessonId);
 	};
 
-	const handleTouchEnd = (e) => {
-		// Handle double-tap on mobile
-		if (e.touches.length === 0) {
-			const now = Date.now();
-			if (!handleTouchEnd.lastTouchEnd || now - handleTouchEnd.lastTouchEnd < 300) {
-				e.preventDefault();
-				e.stopPropagation();
-				toggleLessonVisibility(content.lessonId);
-			}
-			handleTouchEnd.lastTouchEnd = now;
+	// Mobile double-tap detection with movement guard
+	const lastTapRef = useRef(0);
+	const touchStartPosRef = useRef({ x: 0, y: 0 });
+	const TOUCH_TIME_MS = 300;
+	const MOVE_TOLERANCE_PX = 12;
+
+	const handleTouchStart = (e) => {
+		if (e.touches && e.touches.length > 0) {
+			const t = e.touches[0];
+			touchStartPosRef.current = { x: t.clientX, y: t.clientY };
 		}
+	};
+
+	const handleTouchEnd = (e) => {
+		// Ignore if it was a scroll/drag
+		const t = e.changedTouches && e.changedTouches[0];
+		if (t) {
+			const dx = t.clientX - touchStartPosRef.current.x;
+			const dy = t.clientY - touchStartPosRef.current.y;
+			const moved = Math.hypot(dx, dy) > MOVE_TOLERANCE_PX;
+			if (moved) return; // treat as scroll, not tap
+		}
+
+		const now = Date.now();
+		const isDoubleTap = lastTapRef.current && now - lastTapRef.current < TOUCH_TIME_MS;
+		lastTapRef.current = now;
+		if (!isDoubleTap) return; // first tap only, do nothing
+
+		// Real double-tap
+		e.preventDefault();
+		e.stopPropagation();
+		toggleLessonVisibility(content.lessonId);
 	};
 
 	const onHover = () => {
@@ -159,6 +180,7 @@ const DesktopLesson = ({ content, hourLen, prevEndTime, leftSide }) => {
 			onMouseLeave={onStopHover}
 			onClick={showPopup}
 			onDoubleClick={handleDoubleClick}
+			onTouchStart={handleTouchStart}
 			onTouchEnd={handleTouchEnd}
 			onFocus={showPopup}
 			onBlur={hidePopup}
