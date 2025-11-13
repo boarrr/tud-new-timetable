@@ -8,6 +8,7 @@ export function register(config) {
         }
 
         window.addEventListener("load", () => {
+            // eslint-disable-next-line no-unused-vars
             const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
             // ... rest of the code to register the service worker
